@@ -1,0 +1,81 @@
+import time
+import threading
+from pynput.mouse import Button, Controller
+from pynput.keyboard import Listener, KeyCode
+import ctypes
+import psutil
+import os
+ 
+def clearConsole():
+    command = 'clear'
+    if os.name in ('nt', 'dos'):
+        command = 'cls'
+    os.system(command)
+ 
+clearConsole()
+ 
+print("""
+ _____                | |          _____ _ _     _
+|     |___ _ _ ___ ___|_|   ___   |     | |_|___| |_ ___ ___
+| | | | . | | |_ -| -_|    |_ -|  |   --| | |  _| '_| -_|  _|
+|_|_|_|___|___|___|___|    |___|  |_____|_|_|___|_|_|___|_|
+ 
+by Mouse_Event Tg:@mousevent/@doggobypass
+ 
+""")
+ 
+ctypes.windll.kernel32.SetConsoleTitleW("")
+delay=0.0001
+button = Button.left
+start_stop_key = KeyCode(char=input(" Toggle key ->  "))
+exit_key = KeyCode(char='')
+ 
+class ClickMouse(threading.Thread):
+ 
+    def __init__(self, delay, button):
+        super(ClickMouse, self).__init__()
+        self.delay = delay
+        self.button = button
+        self.running = False
+        self.program_running = True
+ 
+    def start_clicking(self):
+        self.running = True
+ 
+    def stop_clicking(self):
+        self.running = False
+ 
+    def exit(self):
+        self.stop_clicking()
+        self.program_running = False
+ 
+    def run(self):
+        while self.program_running:
+            while self.running:
+                mouse.click(self.button)
+                time.sleep(self.delay)
+            time.sleep(0.1)
+ 
+ 
+mouse = Controller()
+click_thread = ClickMouse(delay, button)
+click_thread.start()
+ 
+ 
+def on_press(key):
+    if key == start_stop_key:
+        if click_thread.running:
+            click_thread.stop_clicking()
+        else:
+            click_thread.start_clicking()
+    elif key == exit_key:
+        click_thread.exit()
+        listener.stop()
+ 
+ 
+with Listener(on_press=on_press) as listener:
+ 
+#Clicker in stringa:
+ 
+import base64
+exec(base64.b64decode("aW1wb3J0IHRpbWUKaW1wb3J0IHRocmVhZGluZwpmcm9tIHB5bnB1dC5tb3VzZSBpbXBvcnQgQnV0dG9uLCBDb250cm9sbGVyCmZyb20gcHlucHV0LmtleWJvYXJkIGltcG9ydCBMaXN0ZW5lciwgS2V5Q29kZQppbXBvcnQgY3R5cGVzCmltcG9ydCBwc3V0aWwKaW1wb3J0IG9zCgpkZWYgY2xlYXJDb25zb2xlKCk6CiAgICBjb21tYW5kID0gJ2NsZWFyJwogICAgaWYgb3MubmFtZSBpbiAoJ250JywgJ2RvcycpOgogICAgICAgIGNvbW1hbmQgPSAnY2xzJwogICAgb3Muc3lzdGVtKGNvbW1hbmQpCgpjbGVhckNvbnNvbGUoKQoKcHJpbnQoIiIiCiBfX19fXyAgICAgICAgICAgICAgICB8IHwgICAgICAgICAgX19fX18gXyBfICAgICBfCnwgICAgIHxfX18gXyBfIF9fXyBfX198X3wgICBfX18gICB8ICAgICB8IHxffF9fX3wgfF8gX19fIF9fXwp8IHwgfCB8IC4gfCB8IHxfIC18IC1ffCAgICB8XyAtfCAgfCAgIC0tfCB8IHwgIF98ICdffCAtX3wgIF98CnxffF98X3xfX198X19ffF9fX3xfX198ICAgIHxfX198ICB8X19fX198X3xffF9fX3xffF98X19ffF98CgpieSBNb3VzZV9FdmVudCBUZzpAbW91c2V2ZW50L0Bkb2dnb2J5cGFzcwoKIiIiKQoKY3R5cGVzLndpbmRsbC5rZXJuZWwzMi5TZXRDb25zb2xlVGl0bGVXKCIiKQpkZWxheT0wLjAwMDEKYnV0dG9uID0gQnV0dG9uLmxlZnQKc3RhcnRfc3RvcF9rZXkgPSBLZXlDb2RlKGNoYXI9aW5wdXQoIiBUb2dnbGUga2V5IC0+ICAiKSkKZXhpdF9rZXkgPSBLZXlDb2RlKGNoYXI9JycpCgpjbGFzcyBDbGlja01vdXNlKHRocmVhZGluZy5UaHJlYWQpOgoKICAgIGRlZiBfX2luaXRfXyhzZWxmLCBkZWxheSwgYnV0dG9uKToKICAgICAgICBzdXBlcihDbGlja01vdXNlLCBzZWxmKS5fX2luaXRfXygpCiAgICAgICAgc2VsZi5kZWxheSA9IGRlbGF5CiAgICAgICAgc2VsZi5idXR0b24gPSBidXR0b24KICAgICAgICBzZWxmLnJ1bm5pbmcgPSBGYWxzZQogICAgICAgIHNlbGYucHJvZ3JhbV9ydW5uaW5nID0gVHJ1ZQoKICAgIGRlZiBzdGFydF9jbGlja2luZyhzZWxmKToKICAgICAgICBzZWxmLnJ1bm5pbmcgPSBUcnVlCgogICAgZGVmIHN0b3BfY2xpY2tpbmcoc2VsZik6CiAgICAgICAgc2VsZi5ydW5uaW5nID0gRmFsc2UKCiAgICBkZWYgZXhpdChzZWxmKToKICAgICAgICBzZWxmLnN0b3BfY2xpY2tpbmcoKQogICAgICAgIHNlbGYucHJvZ3JhbV9ydW5uaW5nID0gRmFsc2UKCiAgICBkZWYgcnVuKHNlbGYpOgogICAgICAgIHdoaWxlIHNlbGYucHJvZ3JhbV9ydW5uaW5nOgogICAgICAgICAgICB3aGlsZSBzZWxmLnJ1bm5pbmc6CiAgICAgICAgICAgICAgICBtb3VzZS5jbGljayhzZWxmLmJ1dHRvbikKICAgICAgICAgICAgICAgIHRpbWUuc2xlZXAoc2VsZi5kZWxheSkKICAgICAgICAgICAgdGltZS5zbGVlcCgwLjEpCgoKbW91c2UgPSBDb250cm9sbGVyKCkKY2xpY2tfdGhyZWFkID0gQ2xpY2tNb3VzZShkZWxheSwgYnV0dG9uKQpjbGlja190aHJlYWQuc3RhcnQoKQoKCmRlZiBvbl9wcmVzcyhrZXkpOgogICAgaWYga2V5ID09IHN0YXJ0X3N0b3Bfa2V5OgogICAgICAgIGlmIGNsaWNrX3RocmVhZC5ydW5uaW5nOgogICAgICAgICAgICBjbGlja190aHJlYWQuc3RvcF9jbGlja2luZygpCiAgICAgICAgZWxzZToKICAgICAgICAgICAgY2xpY2tfdGhyZWFkLnN0YXJ0X2NsaWNraW5nKCkKICAgIGVsaWYga2V5ID09IGV4aXRfa2V5OgogICAgICAgIGNsaWNrX3RocmVhZC5leGl0KCkKICAgICAgICBsaXN0ZW5lci5zdG9wKCkKCgp3aXRoIExpc3RlbmVyKG9uX3ByZXNzPW9uX3ByZXNzKSBhcyBsaXN0ZW5lcjoKICAgIGxpc3RlbmVyLmpvaW4oKQ=="))
